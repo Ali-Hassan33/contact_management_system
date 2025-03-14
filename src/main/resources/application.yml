@@ -1,0 +1,14 @@
+# datasource properties
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/mydatabase
+    username: user
+    password: secret
+
+# jwt properties
+app:
+  jwt:
+    key: ${jwt_key}
+    algorithm: ${jwt_algorithm}
+    issuer: ${jwt_issuer}
+    expiresIn: 1m
