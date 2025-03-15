@@ -1,6 +1,7 @@
 package com.contact_management_system.entities;
 
 import com.contact_management_system.enums.EmailLabel;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,13 +21,14 @@ public class PhoneNumber {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-// todo type ? string:integer
+
     private String number;
 
     @Enumerated(STRING)
     private EmailLabel phoneLabel;
 
     @ManyToOne(cascade = {PERSIST, REMOVE})
+    @JsonBackReference
     private ContactProfile contactProfile;
 }
 

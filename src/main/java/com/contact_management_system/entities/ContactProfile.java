@@ -1,5 +1,7 @@
 package com.contact_management_system.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,11 +31,14 @@ public class ContactProfile {
     private String title;
 
     @ManyToOne(cascade = PERSIST)
+    @JsonIgnore
     private User user;
 
     @OneToMany(cascade = PERSIST, fetch = EAGER, mappedBy = "contactProfile")
+    @JsonManagedReference
     private List<EmailAddress> emailAddresses;
 
     @OneToMany(cascade = PERSIST, fetch = EAGER, mappedBy = "contactProfile")
+    @JsonManagedReference
     private List<PhoneNumber> phoneNumbers;
 }
