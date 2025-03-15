@@ -20,6 +20,7 @@ public class WebSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable) // todo
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
+                .authorizeHttpRequests(request -> request.anyRequest().permitAll())
                 .build();
     }
 
