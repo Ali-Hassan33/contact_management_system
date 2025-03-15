@@ -31,6 +31,6 @@ public class User {
 
     private String email;
 
-    @OneToMany(cascade = {PERSIST}, mappedBy = "user", fetch = EAGER)
+    @OneToMany(cascade = {PERSIST}, mappedBy = "user")
     private List<ContactProfile> contactsProfile = new ArrayList<>();
 }

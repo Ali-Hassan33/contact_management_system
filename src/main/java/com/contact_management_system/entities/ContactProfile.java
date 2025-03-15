@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.CascadeType.PERSIST;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -27,12 +28,12 @@ public class ContactProfile {
 
     private String title;
 
-    @ManyToOne
+    @ManyToOne(cascade = PERSIST)
     private User user;
 
-    @OneToMany(mappedBy = "contactProfile", fetch = EAGER)
-    private List<EmailAddress> emailAddresses = new ArrayList<>();
+    @OneToMany(cascade = PERSIST, fetch = EAGER, mappedBy = "contactProfile")
+    private List<EmailAddress> emailAddresses;
 
-    @OneToMany(mappedBy = "contactProfile", fetch = EAGER)
-    private List<PhoneNumber> phoneNumbers = new ArrayList<>();
+    @OneToMany(cascade = PERSIST, fetch = EAGER, mappedBy = "contactProfile")
+    private List<PhoneNumber> phoneNumbers;
 }

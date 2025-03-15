@@ -21,7 +21,7 @@ public class PhoneNumber {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 // todo type ? string:integer
-    private Integer number;
+    private String number;
 
     @Enumerated(STRING)
     private EmailLabel phoneLabel;
