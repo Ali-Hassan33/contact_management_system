@@ -28,7 +28,7 @@ public class UserController {
         return "Hello, " + authentication.getName();
     }
 
-    @GetMapping("/")
+    @GetMapping("/contacts")
     public Iterable<ContactProfile> contacts() {
         return contactProfileRepository.findAllByUserId(10L); // todo
     }
@@ -40,6 +40,11 @@ public class UserController {
         contactProfile.getEmailAddresses().forEach(emailAddress -> emailAddress.setContactProfile(contactProfile));
         contactProfileRepository.save(contactProfile);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/contact/{id}")
+    public void removeContact(@PathVariable Long id) {
+        contactProfileRepository.deleteById(id);
     }
 }
 
