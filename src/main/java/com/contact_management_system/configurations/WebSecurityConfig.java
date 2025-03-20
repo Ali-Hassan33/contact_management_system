@@ -1,13 +1,24 @@
 package com.contact_management_system.configurations;
 
+import com.contact_management_system.security.providers.UserAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.security.Security;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -16,12 +27,39 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class WebSecurityConfig {
 
     @Bean
+    @Order(1)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable) // todo
+                .securityMatcher("/auth/**")
+                .csrf(AbstractHttpConfigurer::disable)
+//                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000", true))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
-                .authorizeHttpRequests(request -> request.anyRequest().permitAll())
+                .authorizeHttpRequests(request -> request.requestMatchers("/auth/signUp", "/auth/")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
+//                .httpBasic(withDefaults())
+//                .authenticationProvider(userAuthenticationProvider)
                 .build();
+    }
+
+    @Bean
+    @Order(2)
+    SecurityFilterChain apisecurityFilterChain(HttpSecurity http, UserAuthenticationProvider userAuthenticationProvider) throws Exception {
+        return http
+                .securityMatcher("/api/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000", true))
+                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+                .httpBasic(withDefaults())
+                .authenticationProvider(userAuthenticationProvider)
+                .build();
+    }
+
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

@@ -32,7 +32,6 @@ public class JwtService {
         } catch (JOSEException e) {
             throw new JwtException(e);
         }
-
         return jwt.serialize();
     }
 
