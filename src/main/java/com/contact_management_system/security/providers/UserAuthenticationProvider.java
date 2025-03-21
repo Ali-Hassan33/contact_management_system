@@ -27,7 +27,6 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        System.out.println(":)");
         userRepository.findByEmail(valueOf(authentication.getPrincipal()))
                 .map(User::getPassword)
                 .filter(password -> passwordEncoder.matches(rawPassword(authentication), password))
