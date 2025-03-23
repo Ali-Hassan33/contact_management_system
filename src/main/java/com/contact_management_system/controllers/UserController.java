@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private final ContactProfileRepository contactProfileRepository;
@@ -27,19 +26,14 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping("/greet")
-    public String publicPage(Authentication authentication) {
-        return "Hello, " + authentication.getName();
-    }
-
-    @GetMapping("/contacts/{userId}")
-    public Iterable<ContactProfile> contacts(@PathVariable Long userId) {
-        return contactProfileRepository.findAllByUserId(userId); // todo
+    @GetMapping("/contacts")
+    public Iterable<ContactProfile> contacts(Authentication authentication) {
+        System.out.println(authentication);
+        return contactProfileRepository.findAllByUserId(30L);
     }
 
     @PostMapping("/signIn")
     public ResponseEntity<String> signIn(Authentication authentication) {
-        System.out.println(authentication);
         var email = String.valueOf(authentication.getPrincipal());
         User user = userRepository.findByEmail(email).orElseThrow();
         Map<String, Object> claims = Map.of("id", user.getId(), "name", user.getUsername(), "email", email);
