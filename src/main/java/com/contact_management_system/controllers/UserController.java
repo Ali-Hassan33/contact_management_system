@@ -17,13 +17,10 @@ public class UserController {
 
     private final ContactProfileRepository contactProfileRepository;
     private final UserRepository userRepository;
-    private final JwtService jwtService;
 
-    public UserController(ContactProfileRepository contactProfileRepository,
-                          UserRepository userRepository, JwtService jwtService) {
+    public UserController(ContactProfileRepository contactProfileRepository, UserRepository userRepository) {
         this.contactProfileRepository = contactProfileRepository;
         this.userRepository = userRepository;
-        this.jwtService = jwtService;
     }
 
     @GetMapping("/contacts")
@@ -32,13 +29,13 @@ public class UserController {
         return contactProfileRepository.findAllByUserId(30L);
     }
 
-    @PostMapping("/signIn")
-    public ResponseEntity<String> signIn(Authentication authentication) {
-        var email = String.valueOf(authentication.getPrincipal());
-        User user = userRepository.findByEmail(email).orElseThrow();
-        Map<String, Object> claims = Map.of("id", user.getId(), "name", user.getUsername(), "email", email);
-        return ResponseEntity.ok(jwtService.generateJwt(claims));
-    }
+//    @PostMapping("/signIn")
+//    public ResponseEntity<String> signIn(Authentication authentication) {
+//        var email = String.valueOf(authentication.getPrincipal());
+//        User user = userRepository.findByEmail(email).orElseThrow();
+//        Map<String, Object> claims = Map.of("id", user.getId(), "name", user.getUsername(), "email", email);
+//        return ResponseEntity.ok(jwtService.generateJwt(claims));
+//    }
 
     @PostMapping("/contact/save")
     public ResponseEntity<ContactProfile> save(@RequestBody ContactProfile contactProfile) {

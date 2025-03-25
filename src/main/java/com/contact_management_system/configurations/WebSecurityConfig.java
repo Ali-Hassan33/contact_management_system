@@ -25,33 +25,32 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class WebSecurityConfig {
 
     @Bean
-    @Order(1)
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(2)
+    SecurityFilterChain securityFilterChain(HttpSecurity http, final CorsConfigurationSource corsConfigurationSource,
+                                            UserAuthenticationProvider userAuthenticationProvider) throws Exception {
         return http
-                .securityMatcher("/auth/**")
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
-                .authorizeHttpRequests(request -> request.requestMatchers("/auth/signUp", "/auth/")
+                .securityMatcher("/auth/**", "/oauth2/authorization/**")
+                .httpBasic(withDefaults())
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/dashboard", true))
+                .authorizeHttpRequests(request -> request.requestMatchers("/auth/signUp")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
+                .authenticationProvider(userAuthenticationProvider)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 
     @Bean
-    @Order(2)
-    SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource,
-                                               UserAuthenticationProvider userAuthenticationProvider) throws Exception {
+    @Order(1)
+    SecurityFilterChain apiSecurityFilterChain(HttpSecurity http,
+                                               final CorsConfigurationSource corsConfigurationSource) throws Exception {
         return http
-                .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource))
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/contacts", true))
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/contacts/**", "/api/", "/api/contact/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
-                .httpBasic(withDefaults())
-                .authenticationProvider(userAuthenticationProvider)
+                .securityMatcher("/api/**")
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
+                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
@@ -61,7 +60,7 @@ public class WebSecurityConfig {
         var corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://localhost:3000");
         corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
         corsConfiguration.setAllowCredentials(true);
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
@@ -69,14 +68,14 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     JwtDecoder jwtDecoder(JwtPropertiesConfig jwtPropertiesConfig) {
         return NimbusJwtDecoder
                 .withSecretKey(jwtPropertiesConfig.getKey())
                 .build();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
