@@ -5,6 +5,7 @@ import com.contact_management_system.entities.User;
 import com.contact_management_system.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -18,11 +19,12 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public User save(UserDto userDto) {
         User user = new User();
         user.setUsername(userDto.getName());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        if (userDto.getPassword() != null)
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setEmail(userDto.getEmail());
         return userRepository.save(user);
     }

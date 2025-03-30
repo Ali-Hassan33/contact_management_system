@@ -29,9 +29,9 @@ public class WebSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, final CorsConfigurationSource corsConfigurationSource,
                                             UserAuthenticationProvider userAuthenticationProvider) throws Exception {
         return http
-                .securityMatcher("/auth/**", "/oauth2/authorization/**")
+//                .securityMatcher("/auth/**", "/oauth2/authorization/**")
                 .httpBasic(withDefaults())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/dashboard", true))
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/github", true))
                 .authorizeHttpRequests(request -> request.requestMatchers("/auth/signUp")
                         .permitAll()
                         .anyRequest()
