@@ -16,7 +16,7 @@ import java.time.Duration;
 @Setter
 @Validated
 @ConfigurationProperties(prefix = "app.jwt")
-public class JwtPropertiesConfig {
+public class JWTPropertiesConfig {
 
     @NotNull
     private SecretKey key;

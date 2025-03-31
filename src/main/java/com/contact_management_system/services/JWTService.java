@@ -1,7 +1,7 @@
 package com.contact_management_system.services;
 
-import com.contact_management_system.configurations.JwtPropertiesConfig;
-import com.contact_management_system.exceptions.JwtException;
+import com.contact_management_system.configurations.JWTPropertiesConfig;
+import com.contact_management_system.entities.User;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -15,23 +15,17 @@ import static java.time.Instant.now;
 import static java.util.Date.from;
 
 @Service
-public class JwtService {
+public class JWTService {
 
-    private final JwtPropertiesConfig jwtProperties;
+    private final JWTPropertiesConfig jwtProperties;
 
-    public JwtService(JwtPropertiesConfig jwtProperties) {
+    public JWTService(JWTPropertiesConfig jwtProperties) {
         this.jwtProperties = jwtProperties;
     }
 
-    public String generateJwt(Map<String, Object> claims) {
-        var jwt = new SignedJWT(header(), claimSet(claims));
-
-        try {
-            var signer = new MACSigner(jwtProperties.getKey());
-            jwt.sign(signer);
-        } catch (JOSEException e) {
-            throw new JwtException(e);
-        }
+    public String serializedJwt(User user) throws JOSEException {
+        var jwt = new SignedJWT(header(), claimSet(Map.of("id", user.getId(), "name", user.getUsername(), "email", user.getEmail())));
+        jwt.sign(new MACSigner(jwtProperties.getKey()));
         return jwt.serialize();
     }
 

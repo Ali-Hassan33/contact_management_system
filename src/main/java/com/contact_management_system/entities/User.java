@@ -47,6 +47,18 @@ public class User implements UserDetails {
     @OneToMany(cascade = {PERSIST}, mappedBy = "user")
     private List<ContactProfile> contactsProfile;
 
+
+    public User(String username, String email) {
+        this.username = username;
+        this.email = email;
+    }
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

@@ -25,24 +25,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class WebSecurityConfig {
 
     @Bean
-    @Order(2)
-    SecurityFilterChain securityFilterChain(HttpSecurity http, final CorsConfigurationSource corsConfigurationSource,
-                                            UserAuthenticationProvider userAuthenticationProvider) throws Exception {
-        return http
-//                .securityMatcher("/auth/**", "/oauth2/authorization/**")
-                .httpBasic(withDefaults())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/github", true))
-                .authorizeHttpRequests(request -> request.requestMatchers("/auth/signUp")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
-                .authenticationProvider(userAuthenticationProvider)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .csrf(AbstractHttpConfigurer::disable)
-                .build();
-    }
-
-    @Bean
     @Order(1)
     SecurityFilterChain apiSecurityFilterChain(HttpSecurity http,
                                                final CorsConfigurationSource corsConfigurationSource) throws Exception {
@@ -56,7 +38,24 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    @Order(2)
+    SecurityFilterChain securityFilterChain(HttpSecurity http, final CorsConfigurationSource corsConfigurationSource,
+                                            UserAuthenticationProvider userAuthenticationProvider) throws Exception {
+        return http
+                .httpBasic(withDefaults())
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/github", true))
+                .authorizeHttpRequests(request -> request.requestMatchers("/auth/signUp")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
+                .authenticationProvider(userAuthenticationProvider)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .csrf(AbstractHttpConfigurer::disable)
+                .build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
         var corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://localhost:3000");
         corsConfiguration.addAllowedHeader("*");
@@ -68,7 +67,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(JwtPropertiesConfig jwtPropertiesConfig) {
+    JwtDecoder jwtDecoder(JWTPropertiesConfig jwtPropertiesConfig) {
         return NimbusJwtDecoder
                 .withSecretKey(jwtPropertiesConfig.getKey())
                 .build();

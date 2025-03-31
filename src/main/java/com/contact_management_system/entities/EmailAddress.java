@@ -1,6 +1,6 @@
 package com.contact_management_system.entities;
 
-import com.contact_management_system.enums.EmailLabel;
+import com.contact_management_system.enums.Label;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +25,7 @@ public class EmailAddress {
     private String email;
 
     @Enumerated(STRING)
-    private EmailLabel emailLabel;
+    private Label emailLabel;
 
     @ManyToOne(cascade = {PERSIST, REMOVE})
     @JsonBackReference
