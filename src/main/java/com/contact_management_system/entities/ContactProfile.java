@@ -7,8 +7,7 @@ import lombok.*;
 
 import java.util.List;
 
-import static jakarta.persistence.CascadeType.PERSIST;
-import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -34,11 +33,11 @@ public class ContactProfile {
     @JsonIgnore
     private User user;
 
-    @OneToMany(cascade = {PERSIST, REMOVE}, fetch = EAGER, mappedBy = "contactProfile")
+    @OneToMany(cascade = {PERSIST, MERGE, REMOVE}, fetch = EAGER, mappedBy = "contactProfile")
     @JsonManagedReference
     private List<EmailAddress> emailAddresses;
 
-    @OneToMany(cascade = {PERSIST, REMOVE}, fetch = EAGER, mappedBy = "contactProfile")
+    @OneToMany(cascade = {PERSIST, MERGE, REMOVE}, fetch = EAGER, mappedBy = "contactProfile")
     @JsonManagedReference
     private List<PhoneNumber> phoneNumbers;
 }

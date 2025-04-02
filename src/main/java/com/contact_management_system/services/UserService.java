@@ -1,23 +1,33 @@
 package com.contact_management_system.services;
 
 import com.contact_management_system.dtos.UserDto;
+import com.contact_management_system.entities.ContactProfile;
 import com.contact_management_system.entities.User;
+import com.contact_management_system.enums.Label;
 import com.contact_management_system.exceptions.EmailNotFoundException;
+import com.contact_management_system.repositories.ContactProfileRepository;
 import com.contact_management_system.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
+import static com.contact_management_system.enums.Label.PERSONAL;
+import static com.contact_management_system.enums.Label.WORK;
+
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ContactProfileRepository contactProfileRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ContactProfileRepository contactProfileRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.contactProfileRepository = contactProfileRepository;
     }
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -30,7 +40,7 @@ public class UserService {
     public User saveOAuth2User(UserDto userDto) {
         return save(new User(userDto.getName(), userDto.getEmail()));
     }
-    
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(EmailNotFoundException::new);
     }
@@ -41,5 +51,35 @@ public class UserService {
 
     private User save(User user) {
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public ContactProfile updateContact(ContactProfile contactDto, Long id) {
+        ContactProfile contact = contactProfileRepository.getContactProfileById(id);
+        contact.setFirstName(contactDto.getFirstName());
+        contact.setLastName(contactDto.getLastName());
+        contact.setTitle(contactDto.getTitle());
+        updateEmailAddresses(contactDto, contact);
+        return contact;
+    }
+
+    private static void updateEmailAddresses(ContactProfile contactDto, ContactProfile contact) {
+        contactDto.getEmailAddresses().removeIf(Objects::isNull);
+        updateEmailAddressByLabel(contactDto, contact, PERSONAL);
+        updateEmailAddressByLabel(contactDto, contact, WORK);
+    }
+
+    private static void updateEmailAddressByLabel(ContactProfile contactDto, ContactProfile contact, final Label LABEL) {
+        contactDto.getEmailAddresses()
+                .stream()
+                .filter(emailAddress -> emailAddress.getEmailLabel() == LABEL)
+                .findAny()
+                .ifPresent(emailAddress -> contact.getEmailAddresses()
+                        .stream()
+                        .filter(targetEmailAddress -> targetEmailAddress.getEmailLabel() == LABEL)
+                        .findAny()
+                        .ifPresentOrElse(targetEmailAddress -> targetEmailAddress.setEmail(emailAddress.getEmail()),
+                                () -> contact.getEmailAddresses().add(emailAddress))
+                );
     }
 }
