@@ -44,7 +44,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private Date updatedAt;
 
-    @OneToMany(cascade = {PERSIST}, mappedBy = "user")
+    @OneToMany(cascade = PERSIST, mappedBy = "user")
     private List<ContactProfile> contactsProfile;
 
 

@@ -7,12 +7,16 @@ import com.contact_management_system.enums.Label;
 import com.contact_management_system.exceptions.EmailNotFoundException;
 import com.contact_management_system.repositories.ContactProfileRepository;
 import com.contact_management_system.repositories.UserRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.contact_management_system.enums.Label.PERSONAL;
 import static com.contact_management_system.enums.Label.WORK;
@@ -23,12 +27,24 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ContactProfileRepository contactProfileRepository;
+    private Long userId;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ContactProfileRepository contactProfileRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.contactProfileRepository = contactProfileRepository;
     }
+
+    public List<ContactProfile> getContacts(Authentication authentication) {
+        this.userId = Optional.of(authentication)
+                .filter(JwtAuthenticationToken.class::isInstance)
+                .map(JwtAuthenticationToken.class::cast)
+                .map(jwt -> jwt.getTokenAttributes().get("id"))
+                .map(Long.class::cast)
+                .orElseThrow(RuntimeException::new);
+        return contactProfileRepository.findAllByUserId(userId);
+    }
+
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public User save(UserDto userDto) {
@@ -41,6 +57,43 @@ public class UserService {
         return save(new User(userDto.getName(), userDto.getEmail()));
     }
 
+    private User save(User user) {
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public ContactProfile updateContact(ContactProfile transientContact, Long id) {
+        ContactProfile contact = contactProfileRepository.getContactProfileById(id);
+
+        contact.setFirstName(transientContact.getFirstName());
+        contact.setLastName(transientContact.getLastName());
+        contact.setTitle(transientContact.getTitle());
+        updateEmailAddresses(transientContact, contact);
+        updatePhoneNumbers(transientContact, contact);
+
+        return contact;
+    }
+
+    public ContactProfile getContactProfile(ContactProfile contactProfile) {
+        contactProfile.setUser(userRepository.findById(userId).orElseThrow());
+
+        contactProfile.getPhoneNumbers()
+                .stream()
+                .filter(Objects::nonNull)
+                .forEach(phoneNumber -> phoneNumber.setContactProfile(contactProfile));
+
+        contactProfile.getEmailAddresses()
+                .stream()
+                .filter(Objects::nonNull)
+                .forEach(emailAddress -> emailAddress.setContactProfile(contactProfile));
+
+        return contactProfileRepository.save(contactProfile);
+    }
+
+    public void deleteContact(Long id) {
+        contactProfileRepository.deleteById(id);
+    }
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(EmailNotFoundException::new);
     }
@@ -49,29 +102,16 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    private User save(User user) {
-        return userRepository.save(user);
-    }
-
-    @Transactional
-    public ContactProfile updateContact(ContactProfile contactDto, Long id) {
-        ContactProfile contact = contactProfileRepository.getContactProfileById(id);
-        contact.setFirstName(contactDto.getFirstName());
-        contact.setLastName(contactDto.getLastName());
-        contact.setTitle(contactDto.getTitle());
-        updateEmailAddresses(contactDto, contact);
-        updatePhoneNumbers(contactDto, contact);
-        return contact;
-    }
-
     private static void updateEmailAddresses(ContactProfile contactDto, ContactProfile contact) {
         contactDto.getEmailAddresses().removeIf(Objects::isNull);
+
         updateEmailAddressByLabel(contactDto, contact, PERSONAL);
         updateEmailAddressByLabel(contactDto, contact, WORK);
     }
 
     private static void updatePhoneNumbers(ContactProfile contactDto, ContactProfile contact) {
         contactDto.getPhoneNumbers().removeIf(Objects::isNull);
+
         updatePhoneNumbersByLabel(contactDto, contact, PERSONAL);
         updatePhoneNumbersByLabel(contactDto, contact, WORK);
     }

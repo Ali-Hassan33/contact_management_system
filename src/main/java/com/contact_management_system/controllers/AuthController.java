@@ -27,6 +27,4 @@ public class AuthController {
     public ResponseEntity<String> signIn(Authentication authentication) throws JOSEException {
         return ResponseEntity.ok(authService.login(authentication));
     }
-
-
 }
