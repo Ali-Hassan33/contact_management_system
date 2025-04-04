@@ -60,6 +60,7 @@ public class UserService {
         contact.setLastName(contactDto.getLastName());
         contact.setTitle(contactDto.getTitle());
         updateEmailAddresses(contactDto, contact);
+        updatePhoneNumbers(contactDto, contact);
         return contact;
     }
 
@@ -69,7 +70,30 @@ public class UserService {
         updateEmailAddressByLabel(contactDto, contact, WORK);
     }
 
-    private static void updateEmailAddressByLabel(ContactProfile contactDto, ContactProfile contact, final Label LABEL) {
+    private static void updatePhoneNumbers(ContactProfile contactDto, ContactProfile contact) {
+        contactDto.getPhoneNumbers().removeIf(Objects::isNull);
+        updatePhoneNumbersByLabel(contactDto, contact, PERSONAL);
+        updatePhoneNumbersByLabel(contactDto, contact, WORK);
+    }
+
+    private static void updatePhoneNumbersByLabel(ContactProfile contactDto, ContactProfile contact, Label LABEL) {
+        contactDto.getPhoneNumbers()
+                .stream()
+                .filter(phoneNumber -> phoneNumber.getPhoneLabel() == LABEL)
+                .findAny()
+                .ifPresent(phoneNumber -> contact.getPhoneNumbers()
+                        .stream()
+                        .filter(targetPhoneNumber -> targetPhoneNumber.getPhoneLabel() == LABEL)
+                        .findAny()
+                        .ifPresentOrElse(targetPhoneNumber -> targetPhoneNumber.setNumber(phoneNumber.getNumber()),
+                                () -> {
+                                    contact.getPhoneNumbers().add(phoneNumber);
+                                    phoneNumber.setContactProfile(contact);
+                                })
+                );
+    }
+
+    private static void updateEmailAddressByLabel(ContactProfile contactDto, ContactProfile contact, Label LABEL) {
         contactDto.getEmailAddresses()
                 .stream()
                 .filter(emailAddress -> emailAddress.getEmailLabel() == LABEL)
@@ -79,7 +103,10 @@ public class UserService {
                         .filter(targetEmailAddress -> targetEmailAddress.getEmailLabel() == LABEL)
                         .findAny()
                         .ifPresentOrElse(targetEmailAddress -> targetEmailAddress.setEmail(emailAddress.getEmail()),
-                                () -> contact.getEmailAddresses().add(emailAddress))
+                                () -> {
+                                    contact.getEmailAddresses().add(emailAddress);
+                                    emailAddress.setContactProfile(contact);
+                                })
                 );
     }
 }
