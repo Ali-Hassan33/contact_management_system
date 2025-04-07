@@ -1,10 +1,12 @@
 package com.contact_management_system.controllers;
 
 import com.contact_management_system.entities.ContactProfile;
+import com.contact_management_system.services.CSVService;
 import com.contact_management_system.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -14,8 +16,11 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    private final CSVService csvService;
+
+    public UserController(UserService userService, CSVService csvService) {
         this.userService = userService;
+        this.csvService = csvService;
     }
 
     @GetMapping("/contacts")
@@ -25,7 +30,7 @@ public class UserController {
 
     @PostMapping("/contact/save")
     public ResponseEntity<ContactProfile> save(@RequestBody ContactProfile contactProfile) {
-        return ResponseEntity.ok(userService.getContactProfile(contactProfile));
+        return ResponseEntity.ok(userService.saveContact(contactProfile));
     }
 
     @PutMapping(value = "/contact/update/{id}")
@@ -36,6 +41,11 @@ public class UserController {
     @DeleteMapping("/contact/{id}")
     public void remove(@PathVariable Long id) {
         userService.deleteContact(id);
+    }
+
+    @PostMapping(value = "/contacts/import", consumes = "multipart/form-data")
+    public void importContacts(@RequestParam("csvFile") MultipartFile file) {
+        csvService.importCsv(file);
     }
 }
 

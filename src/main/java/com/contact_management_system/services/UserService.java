@@ -74,7 +74,8 @@ public class UserService {
         return contact;
     }
 
-    public ContactProfile getContactProfile(ContactProfile contactProfile) {
+    @Transactional
+    public ContactProfile saveContact(ContactProfile contactProfile) {
         contactProfile.setUser(userRepository.findById(userId).orElseThrow());
 
         contactProfile.getPhoneNumbers()
