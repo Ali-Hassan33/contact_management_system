@@ -27,7 +27,7 @@ public class CSVService {
 
     @SneakyThrows
     public void importCsv(MultipartFile file) {
-        csvConfiguration.setResource(file.getResource());
+        csvConfiguration.setCsv(file.getResource());
         JobParameters jobParameters = new JobParametersBuilder()
                 .addDate("date", new Date())
                 .toJobParameters();

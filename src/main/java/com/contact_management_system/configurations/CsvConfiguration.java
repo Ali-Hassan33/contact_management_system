@@ -25,8 +25,6 @@ import static com.contact_management_system.enums.Label.WORK;
 @Configuration
 public class CsvConfiguration {
 
-    private Resource resource;
-
     @Bean
     FlatFileItemReader<CsvRow> csvFileReader() {
         return new FlatFileItemReaderBuilder<CsvRow>()
@@ -56,18 +54,18 @@ public class CsvConfiguration {
                                 EmailAddress.builder().emailLabel(PERSONAL).email(csvRow.email()).build(),
                                 EmailAddress.builder().emailLabel(WORK).email(csvRow.workEmail()).build()))
                         .phoneNumbers(List.of(
-                                PhoneNumber.builder().phoneLabel(PERSONAL).number(csvRow.email()).build(),
-                                PhoneNumber.builder().phoneLabel(WORK).number(csvRow.workEmail()).build()))
+                                PhoneNumber.builder().phoneLabel(PERSONAL).number(csvRow.phoneNumber()).build(),
+                                PhoneNumber.builder().phoneLabel(WORK).number(csvRow.workPhoneNumber()).build()))
                         .build()));
     }
 
     @Bean
-    Step step(JobRepository jobRepository,
-              PlatformTransactionManager transactionManager, ItemWriter<CsvRow> csvFileWriter) {
+    Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+              FlatFileItemReader<CsvRow> csvFileReader, ItemWriter<CsvRow> itemWriter) {
         return new StepBuilder("CsvToTable", jobRepository)
                 .<CsvRow, CsvRow>chunk(100, transactionManager)
-                .reader(csvFileReader())
-                .writer(csvFileWriter)
+                .reader(csvFileReader)
+                .writer(itemWriter)
                 .build();
     }
 
@@ -78,7 +76,7 @@ public class CsvConfiguration {
                 .build();
     }
 
-    public void setResource(Resource resource) {
+    public void setCsv(Resource resource) {
         csvFileReader().setResource(resource);
     }
 }
