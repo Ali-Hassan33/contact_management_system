@@ -1,14 +1,29 @@
-# datasource properties
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/mydatabase
     username: user
     password: secret
-
-# jwt properties
+  jpa:
+    show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${client_id}
+            client-secret: ${client_secret}
+            scope:
+              - read:user
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: off
 app:
   jwt:
     key: ${jwt_key}
     algorithm: ${jwt_algorithm}
     issuer: ${jwt_issuer}
-    expiresIn: 1m
+    expiresIn: 30m
+
+
