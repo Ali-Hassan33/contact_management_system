@@ -7,6 +7,8 @@ import com.contact_management_system.enums.Label;
 import com.contact_management_system.exceptions.EmailNotFoundException;
 import com.contact_management_system.repositories.ContactProfileRepository;
 import com.contact_management_system.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -35,14 +36,14 @@ public class UserService {
         this.contactProfileRepository = contactProfileRepository;
     }
 
-    public List<ContactProfile> getContacts(Authentication authentication) {
+    public Page<ContactProfile> fetchContacts(Authentication authentication, int pageNumber, int pageSize) {
         this.userId = Optional.of(authentication)
                 .filter(JwtAuthenticationToken.class::isInstance)
                 .map(JwtAuthenticationToken.class::cast)
                 .map(jwt -> jwt.getTokenAttributes().get("id"))
                 .map(Long.class::cast)
                 .orElseThrow(RuntimeException::new);
-        return contactProfileRepository.findAllByUserId(userId);
+        return contactProfileRepository.findAllByUserId(userId, PageRequest.of(pageNumber, pageSize));
     }
 
 

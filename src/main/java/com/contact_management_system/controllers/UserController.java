@@ -3,12 +3,11 @@ package com.contact_management_system.controllers;
 import com.contact_management_system.entities.ContactProfile;
 import com.contact_management_system.services.CSVService;
 import com.contact_management_system.services.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -24,8 +23,8 @@ public class UserController {
     }
 
     @GetMapping("/contacts")
-    public List<ContactProfile> contacts(Authentication authentication) {
-        return userService.getContacts(authentication);
+    public Page<ContactProfile> contacts(Authentication authentication, @RequestParam int page, @RequestParam int pageSize) {
+        return userService.fetchContacts(authentication, page, pageSize);
     }
 
     @PostMapping("/contact/save")
