@@ -10,21 +10,21 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class BasicAuthController {
 
     private final AuthService authService;
 
-    public AuthController(AuthService authService) {
+    public BasicAuthController(AuthService authService) {
         this.authService = authService;
     }
 
-    @PostMapping("/signUp")
-    public ResponseEntity<User> signUp(@RequestBody UserDto user) {
+    @PostMapping("/signup")
+    public ResponseEntity<User> signup(@RequestBody UserDto user) {
         return ResponseEntity.ok(authService.signUp(user));
     }
 
-    @PostMapping("/signIn")
-    public ResponseEntity<String> signIn(Authentication authentication) throws JOSEException {
+    @PostMapping("/login")
+    public ResponseEntity<String> login(Authentication authentication) throws JOSEException {
         return ResponseEntity.ok(authService.login(authentication));
     }
 }

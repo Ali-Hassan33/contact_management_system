@@ -27,6 +27,11 @@ public class UserController {
         return userService.fetchContacts(authentication, page, pageSize);
     }
 
+    @GetMapping("/contacts/all")
+    public Page<ContactProfile> contacts(Authentication authentication) {
+        return userService.fetchContacts(authentication, null, null);
+    }
+
     @PostMapping("/contact/save")
     public ResponseEntity<ContactProfile> save(@RequestBody ContactProfile contactProfile) {
         return ResponseEntity.ok(userService.saveContact(contactProfile));

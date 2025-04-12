@@ -9,6 +9,7 @@ import com.contact_management_system.repositories.ContactProfileRepository;
 import com.contact_management_system.repositories.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -36,13 +37,15 @@ public class UserService {
         this.contactProfileRepository = contactProfileRepository;
     }
 
-    public Page<ContactProfile> fetchContacts(Authentication authentication, int pageNumber, int pageSize) {
+    public Page<ContactProfile> fetchContacts(Authentication authentication, Integer pageNumber, Integer pageSize) {
         this.userId = Optional.of(authentication)
                 .filter(JwtAuthenticationToken.class::isInstance)
                 .map(JwtAuthenticationToken.class::cast)
                 .map(jwt -> jwt.getTokenAttributes().get("id"))
                 .map(Long.class::cast)
                 .orElseThrow(RuntimeException::new);
+        if(pageNumber == null && pageSize == null)
+            return contactProfileRepository.findAllByUserId(userId, Pageable.unpaged());
         return contactProfileRepository.findAllByUserId(userId, PageRequest.of(pageNumber, pageSize));
     }
 

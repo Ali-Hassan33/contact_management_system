@@ -6,11 +6,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
-import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
+import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.DIRECT;
 
 @SpringBootApplication
 @EnableConfigurationProperties(JWTPropertiesConfig.class)
-@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
+@EnableSpringDataWebSupport(pageSerializationMode = DIRECT)
 public class ContactManagementSystemApplication {
 
     public static void main(String[] args) {

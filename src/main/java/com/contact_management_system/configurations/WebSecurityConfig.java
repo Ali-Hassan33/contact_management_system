@@ -42,13 +42,28 @@ public class WebSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, final CorsConfigurationSource corsConfigurationSource,
                                             UserAuthenticationProvider userAuthenticationProvider) throws Exception {
         return http
+                .securityMatcher("/auth/**")
                 .httpBasic(withDefaults())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/github", true))
-                .authorizeHttpRequests(request -> request.requestMatchers("/auth/signUp")
+                .authorizeHttpRequests(request -> request.requestMatchers("/auth/signup")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
                 .authenticationProvider(userAuthenticationProvider)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .csrf(AbstractHttpConfigurer::disable)
+                .build();
+    }
+
+    @Bean
+    @Order(3)
+    SecurityFilterChain githubSecurityFilterChain(HttpSecurity http, final CorsConfigurationSource corsConfigurationSource) throws Exception {
+        return http
+//                .securityMatcher("/github/oauth/**", "/login/oauth2/code/**", "/oauth2/authorization/**")
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/github", true))
+                .authorizeHttpRequests(request -> request.requestMatchers("/github/oauth/login")
+                        .authenticated()
+                        .anyRequest()
+                        .permitAll())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
