@@ -37,7 +37,7 @@ public class UserController {
         return ResponseEntity.ok(userService.saveContact(contactProfile));
     }
 
-    @PutMapping(value = "/contact/update/{id}")
+    @PutMapping("/contact/update/{id}")
     public ResponseEntity<ContactProfile> update(@RequestBody ContactProfile contact, @PathVariable Long id) {
         return ResponseEntity.ok(userService.updateContact(contact, id));
     }
