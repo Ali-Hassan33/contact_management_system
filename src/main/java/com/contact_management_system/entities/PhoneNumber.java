@@ -27,7 +27,7 @@ public class PhoneNumber {
     @Enumerated(STRING)
     private Label phoneLabel;
 
-    @ManyToOne(cascade = {PERSIST, REMOVE})
+    @ManyToOne(cascade = PERSIST)
     @JsonBackReference
     private ContactProfile contactProfile;
 }

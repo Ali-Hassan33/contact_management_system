@@ -33,11 +33,11 @@ public class ContactProfile {
     @JsonIgnore
     private User user;
 
-    @OneToMany(cascade = {PERSIST, MERGE, REMOVE}, fetch = EAGER, mappedBy = "contactProfile")
+    @OneToMany(cascade = {PERSIST, MERGE}, orphanRemoval = true, fetch = EAGER, mappedBy = "contactProfile")
     @JsonManagedReference
     private List<EmailAddress> emailAddresses;
 
-    @OneToMany(cascade = {PERSIST, MERGE, REMOVE}, fetch = EAGER, mappedBy = "contactProfile")
+    @OneToMany(cascade = {PERSIST, MERGE}, orphanRemoval = true, fetch = EAGER, mappedBy = "contactProfile")
     @JsonManagedReference
     private List<PhoneNumber> phoneNumbers;
 }

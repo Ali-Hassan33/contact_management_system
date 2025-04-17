@@ -27,7 +27,7 @@ public class EmailAddress {
     @Enumerated(STRING)
     private Label emailLabel;
 
-    @ManyToOne(cascade = {PERSIST, REMOVE})
+    @ManyToOne(cascade = PERSIST)
     @JsonBackReference
     private ContactProfile contactProfile;
 }

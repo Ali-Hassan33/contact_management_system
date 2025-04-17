@@ -44,7 +44,7 @@ public class UserService {
                 .map(jwt -> jwt.getTokenAttributes().get("id"))
                 .map(Long.class::cast)
                 .orElseThrow(RuntimeException::new);
-        if(pageNumber == null && pageSize == null)
+        if (pageNumber == null && pageSize == null)
             return contactProfileRepository.findAllByUserId(userId, Pageable.unpaged());
         return contactProfileRepository.findAllByUserId(userId, PageRequest.of(pageNumber, pageSize));
     }
@@ -126,7 +126,7 @@ public class UserService {
                 .stream()
                 .filter(phoneNumber -> phoneNumber.getPhoneLabel() == LABEL)
                 .findAny()
-                .ifPresent(phoneNumber -> contact.getPhoneNumbers()
+                .ifPresentOrElse(phoneNumber -> contact.getPhoneNumbers()
                         .stream()
                         .filter(targetPhoneNumber -> targetPhoneNumber.getPhoneLabel() == LABEL)
                         .findAny()
@@ -134,7 +134,8 @@ public class UserService {
                                 () -> {
                                     contact.getPhoneNumbers().add(phoneNumber);
                                     phoneNumber.setContactProfile(contact);
-                                })
+                                }),
+                        () -> contact.getPhoneNumbers().removeIf(targetPhoneNumber -> targetPhoneNumber.getPhoneLabel() == LABEL)
                 );
     }
 
@@ -143,15 +144,15 @@ public class UserService {
                 .stream()
                 .filter(emailAddress -> emailAddress.getEmailLabel() == LABEL)
                 .findAny()
-                .ifPresent(emailAddress -> contact.getEmailAddresses()
-                        .stream()
-                        .filter(targetEmailAddress -> targetEmailAddress.getEmailLabel() == LABEL)
-                        .findAny()
-                        .ifPresentOrElse(targetEmailAddress -> targetEmailAddress.setEmail(emailAddress.getEmail()),
-                                () -> {
-                                    contact.getEmailAddresses().add(emailAddress);
-                                    emailAddress.setContactProfile(contact);
-                                })
-                );
+                .ifPresentOrElse(emailAddress -> contact.getEmailAddresses()
+                                .stream()
+                                .filter(targetEmailAddress -> targetEmailAddress.getEmailLabel() == LABEL)
+                                .findAny()
+                                .ifPresentOrElse(targetEmailAddress -> targetEmailAddress.setEmail(emailAddress.getEmail()),
+                                        () -> {
+                                            contact.getEmailAddresses().add(emailAddress);
+                                            emailAddress.setContactProfile(contact);
+                                        }),
+                        () -> contact.getEmailAddresses().removeIf(targetEmailAddress -> targetEmailAddress.getEmailLabel() == LABEL));
     }
 }
