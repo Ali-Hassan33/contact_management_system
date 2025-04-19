@@ -37,16 +37,23 @@ public class UserService {
         this.contactProfileRepository = contactProfileRepository;
     }
 
-    public Page<ContactProfile> fetchContacts(Authentication authentication, Integer pageNumber, Integer pageSize) {
+    public Page<ContactProfile> fetchContacts(Authentication authentication) {
+        initializeUserId(authentication);
+        return contactProfileRepository.findAllByUserId(userId, Pageable.unpaged());
+    }
+
+    public Page<ContactProfile> fetchContactsByPage(Authentication authentication, Integer pageNo, Integer pageSize) {
+        initializeUserId(authentication);
+        return contactProfileRepository.findAllByUserId(userId, PageRequest.of(pageNo, pageSize));
+    }
+
+    private void initializeUserId(Authentication authentication) {
         this.userId = Optional.of(authentication)
                 .filter(JwtAuthenticationToken.class::isInstance)
                 .map(JwtAuthenticationToken.class::cast)
                 .map(jwt -> jwt.getTokenAttributes().get("id"))
                 .map(Long.class::cast)
                 .orElseThrow(RuntimeException::new);
-        if (pageNumber == null && pageSize == null)
-            return contactProfileRepository.findAllByUserId(userId, Pageable.unpaged());
-        return contactProfileRepository.findAllByUserId(userId, PageRequest.of(pageNumber, pageSize));
     }
 
 
@@ -127,14 +134,14 @@ public class UserService {
                 .filter(phoneNumber -> phoneNumber.getPhoneLabel() == LABEL)
                 .findAny()
                 .ifPresentOrElse(phoneNumber -> contact.getPhoneNumbers()
-                        .stream()
-                        .filter(targetPhoneNumber -> targetPhoneNumber.getPhoneLabel() == LABEL)
-                        .findAny()
-                        .ifPresentOrElse(targetPhoneNumber -> targetPhoneNumber.setNumber(phoneNumber.getNumber()),
-                                () -> {
-                                    contact.getPhoneNumbers().add(phoneNumber);
-                                    phoneNumber.setContactProfile(contact);
-                                }),
+                                .stream()
+                                .filter(targetPhoneNumber -> targetPhoneNumber.getPhoneLabel() == LABEL)
+                                .findAny()
+                                .ifPresentOrElse(targetPhoneNumber -> targetPhoneNumber.setNumber(phoneNumber.getNumber()),
+                                        () -> {
+                                            contact.getPhoneNumbers().add(phoneNumber);
+                                            phoneNumber.setContactProfile(contact);
+                                        }),
                         () -> contact.getPhoneNumbers().removeIf(targetPhoneNumber -> targetPhoneNumber.getPhoneLabel() == LABEL)
                 );
     }

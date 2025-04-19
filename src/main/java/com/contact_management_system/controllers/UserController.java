@@ -24,12 +24,12 @@ public class UserController {
 
     @GetMapping("/contacts")
     public Page<ContactProfile> contacts(Authentication authentication, @RequestParam int page, @RequestParam int pageSize) {
-        return userService.fetchContacts(authentication, page, pageSize);
+        return userService.fetchContactsByPage(authentication, page, pageSize);
     }
 
     @GetMapping("/contacts/all")
     public Page<ContactProfile> contacts(Authentication authentication) {
-        return userService.fetchContacts(authentication, null, null);
+        return userService.fetchContacts(authentication);
     }
 
     @PostMapping("/contact/save")
