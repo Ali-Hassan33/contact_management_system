@@ -1,13 +1,12 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5433/mydatabase
-    username: user
-    password: secret
+  docker:
+    compose:
+      file: compose.yaml
+  sql:
+    init:
+      mode: never
   jpa:
     show-sql: true
-    properties:
-      hibernate:
-        format_sql: false
   mail:
     host: smtp.gmail.com
     port: 587
