@@ -4,6 +4,7 @@ import com.contact_management_system.dtos.UserDto;
 import com.contact_management_system.entities.User;
 import com.contact_management_system.services.AuthService;
 import com.nimbusds.jose.JOSEException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,6 +38,7 @@ class BasicAuthControllerTests {
     AuthService authService;
 
     @Test
+    @DisplayName("Should successfully register a new user")
     void testSignup() throws Exception {
         String requestBody = """
                 {
@@ -67,6 +69,7 @@ class BasicAuthControllerTests {
     }
 
     @Test
+    @DisplayName("Should successfully authenticate and return JWT token")
     @WithMockUser(username = "test@example.com")
     void testLogin() throws Exception {
         String jwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTUxNjIzOTAyMn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -80,12 +83,14 @@ class BasicAuthControllerTests {
     }
 
     @Test
+    @DisplayName("Should return forbidden status when login attempted without authentication")
     void testLoginWithoutAuthentication() throws Exception {
         mockMvc.perform(post("/auth/login"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
+    @DisplayName("Should handle signup with incomplete user data")
     void testSignupWithInvalidData() throws Exception {
         String requestBody = """
                 {
@@ -103,6 +108,7 @@ class BasicAuthControllerTests {
     }
 
     @Test
+    @DisplayName("Should throw exception when signup attempted with invalid email format")
     void testSignupWithInvalidEmail() {
         String requestBody = """
                 {
@@ -127,6 +133,7 @@ class BasicAuthControllerTests {
     }
 
     @Test
+    @DisplayName("Should handle JWT creation errors during login")
     @WithMockUser(username = "test@example.com")
     void testLoginWithJoseException() throws Exception {
         when(authService.login(any(Authentication.class))).thenThrow(new JOSEException("Error creating JWT"));

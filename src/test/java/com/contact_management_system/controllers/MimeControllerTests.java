@@ -2,6 +2,7 @@ package com.contact_management_system.controllers;
 
 import com.contact_management_system.dtos.ResetPasswordDto;
 import com.contact_management_system.services.MimeService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,6 +34,7 @@ class MimeControllerTests {
     MimeService mimeService;
 
     @Test
+    @DisplayName("Should send password reset email to the specified recipient")
     @WithMockUser
     void testResetPasswordMail() throws Exception {
         String recipientEmail = "test@example.com";
@@ -45,6 +47,7 @@ class MimeControllerTests {
     }
 
     @Test
+    @DisplayName("Should reset password with valid token and new password")
     @WithMockUser
     void testResetPassword() throws Exception {
         String requestBody = """

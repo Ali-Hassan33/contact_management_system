@@ -6,6 +6,7 @@ import com.contact_management_system.entities.PhoneNumber;
 import com.contact_management_system.enums.Label;
 import com.contact_management_system.services.CSVService;
 import com.contact_management_system.services.UserService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -51,6 +52,7 @@ class UserControllerTests {
     CSVService csvService;
 
     @Test
+    @DisplayName("Should retrieve paginated contacts for authenticated user")
     @WithMockUser
     void testGetContactsByPage() throws Exception {
         ContactProfile mockProfile = createMockContactProfile();
@@ -75,6 +77,7 @@ class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Should retrieve all contacts for authenticated user")
     @WithMockUser
     void testGetAllContacts() throws Exception {
         ContactProfile mockProfile = createMockContactProfile();
@@ -101,6 +104,7 @@ class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Should save new contact and return saved contact details")
     @WithMockUser
     void testSaveContact() throws Exception {
         ContactProfile mockProfile = createMockContactProfile();
@@ -130,6 +134,7 @@ class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Should update existing contact and return updated contact details")
     @WithMockUser
     void testUpdateContact() throws Exception {
         ContactProfile mockProfile = createMockContactProfile();
@@ -160,6 +165,7 @@ class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Should delete contact by ID")
     @WithMockUser
     void testDeleteContact() throws Exception {
         mockMvc.perform(delete("/api/contact/1"))
@@ -169,6 +175,7 @@ class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Should import contacts from CSV file")
     @WithMockUser
     void testImportContacts() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
