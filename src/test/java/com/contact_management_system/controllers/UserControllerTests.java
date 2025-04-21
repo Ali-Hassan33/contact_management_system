@@ -59,7 +59,7 @@ class UserControllerTests {
         List<ContactProfile> contacts = List.of(mockProfile);
         Page<ContactProfile> contactsPage = new PageImpl<>(contacts);
 
-        when(userService.fetchContactsByPage(any(Authentication.class), eq(0), eq(10)))
+        when(userService.getContactsPaginated(any(Authentication.class), eq(0), eq(10)))
                 .thenReturn(contactsPage);
 
         mockMvc.perform(get("/api/contacts")
@@ -73,7 +73,7 @@ class UserControllerTests {
                 .andExpect(jsonPath("$.content[0].emailAddresses", hasSize(2)))
                 .andExpect(jsonPath("$.content[0].phoneNumbers", hasSize(2)));
 
-        verify(userService).fetchContactsByPage(any(Authentication.class), eq(0), eq(10));
+        verify(userService).getContactsPaginated(any(Authentication.class), eq(0), eq(10));
     }
 
     @Test
@@ -84,7 +84,7 @@ class UserControllerTests {
         List<ContactProfile> contacts = List.of(mockProfile);
         Page<ContactProfile> contactsPage = new PageImpl<>(contacts);
 
-        when(userService.fetchContacts(any(Authentication.class)))
+        when(userService.getContacts(any(Authentication.class)))
                 .thenReturn(contactsPage);
 
         mockMvc.perform(get("/api/contacts/all"))
@@ -100,11 +100,11 @@ class UserControllerTests {
                 .andExpect(jsonPath("$.content[0].phoneNumbers[0].number", is("555-123-4567")))
                 .andExpect(jsonPath("$.content[0].phoneNumbers[1].number", is("555-987-6543")));
 
-        verify(userService).fetchContacts(any(Authentication.class));
+        verify(userService).getContacts(any(Authentication.class));
     }
 
     @Test
-    @DisplayName("Should save new contact and return saved contact details")
+    @DisplayName("Should save contact and return saved contact")
     @WithMockUser
     void testSaveContact() throws Exception {
         ContactProfile mockProfile = createMockContactProfile();
@@ -134,7 +134,7 @@ class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Should update existing contact and return updated contact details")
+    @DisplayName("Should update existing contact and return updated contact")
     @WithMockUser
     void testUpdateContact() throws Exception {
         ContactProfile mockProfile = createMockContactProfile();
@@ -165,7 +165,7 @@ class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Should delete contact by ID")
+    @DisplayName("Should delete contact by id")
     @WithMockUser
     void testDeleteContact() throws Exception {
         mockMvc.perform(delete("/api/contact/1"))
@@ -175,7 +175,7 @@ class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Should import contacts from CSV file")
+    @DisplayName("Should import contacts from csv file")
     @WithMockUser
     void testImportContacts() throws Exception {
         MockMultipartFile file = new MockMultipartFile(

@@ -24,7 +24,7 @@ public class AuthService {
     }
 
     public User signUp(UserDto user) {
-        return userService.save(user);
+        return userService.saveBasicAuthUser(user);
     }
 
     public String login(Authentication authentication) throws JOSEException {
