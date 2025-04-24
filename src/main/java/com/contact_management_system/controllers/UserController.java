@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -42,9 +44,14 @@ public class UserController {
         return ResponseEntity.ok(userService.updateContact(contact, id));
     }
 
-    @DeleteMapping("/contact/{id}")
+    @DeleteMapping("/contact/delete/{id}")
     public void remove(@PathVariable Long id) {
         userService.deleteContact(id);
+    }
+
+    @DeleteMapping("/contacts/delete")
+    public void remove(@RequestBody List<Long> ids) {
+        userService.deleteContacts(ids);
     }
 
     @PostMapping(value = "/contacts/import", consumes = "multipart/form-data")

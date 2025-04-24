@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -90,6 +91,10 @@ public class UserService {
 
     public void deleteContact(Long id) {
         contactProfileRepository.deleteById(id);
+    }
+
+    public void deleteContacts(List<Long> ids) {
+        contactProfileRepository.deleteAllById(ids);
     }
 
     public User getUserByEmail(String email) {
