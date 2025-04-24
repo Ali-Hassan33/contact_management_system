@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -30,10 +29,10 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -113,7 +112,7 @@ class UserControllerTests {
                 .thenReturn(mockProfile);
 
         mockMvc.perform(post("/api/contact/save")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName", is("John")))
@@ -143,7 +142,7 @@ class UserControllerTests {
                 .thenReturn(mockProfile);
 
         mockMvc.perform(put("/api/contact/update/1")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
@@ -168,10 +167,24 @@ class UserControllerTests {
     @DisplayName("Should delete contact by id")
     @WithMockUser
     void testDeleteContact() throws Exception {
-        mockMvc.perform(delete("/api/contact/1"))
+        mockMvc.perform(delete("/api/contact/delete/1"))
                 .andExpect(status().isOk());
 
         verify(userService).deleteContact(1L);
+    }
+
+    @Test
+    @DisplayName("Should delete contacts by id")
+    @WithMockUser
+    void testDeleteContacts() throws Exception {
+        mockMvc.perform(delete("/api/contacts/delete")
+                        .contentType(APPLICATION_JSON)
+                        .content("""
+                                [1, 2, 3]
+                                """))
+                .andExpect(status().isOk());
+
+        verify(userService).deleteContacts(anyList());
     }
 
     @Test
