@@ -19,12 +19,12 @@ public class BasicAuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody UserDto user) {
+    ResponseEntity<User> signup(@RequestBody UserDto user) {
         return ResponseEntity.ok(authService.signUp(user));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(Authentication authentication) throws JOSEException {
+    ResponseEntity<String> login(Authentication authentication) throws JOSEException {
         return ResponseEntity.ok(authService.login(authentication));
     }
 }

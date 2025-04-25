@@ -19,7 +19,7 @@ public class GithubOAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(Authentication authentication) throws JOSEException {
+    ResponseEntity<String> login(Authentication authentication) throws JOSEException {
         return ResponseEntity.ok(authService.login(authentication));
     }
 }

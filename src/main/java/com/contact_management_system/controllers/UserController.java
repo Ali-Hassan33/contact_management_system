@@ -25,37 +25,37 @@ public class UserController {
     }
 
     @GetMapping("/contacts")
-    public Page<ContactProfile> contacts(Authentication authentication, @RequestParam int page, @RequestParam int pageSize) {
+    Page<ContactProfile> contacts(Authentication authentication, @RequestParam int page, @RequestParam int pageSize) {
         return userService.getContactsPaginated(authentication, page, pageSize);
     }
 
     @GetMapping("/contacts/all")
-    public Page<ContactProfile> contacts(Authentication authentication) {
+    Page<ContactProfile> contacts(Authentication authentication) {
         return userService.getContacts(authentication);
     }
 
     @PostMapping("/contact/save")
-    public ResponseEntity<ContactProfile> save(@RequestBody ContactProfile contactProfile) {
+    ResponseEntity<ContactProfile> save(@RequestBody ContactProfile contactProfile) {
         return ResponseEntity.ok(userService.saveContact(contactProfile));
     }
 
     @PutMapping("/contact/update/{id}")
-    public ResponseEntity<ContactProfile> update(@RequestBody ContactProfile contact, @PathVariable Long id) {
+    ResponseEntity<ContactProfile> update(@RequestBody ContactProfile contact, @PathVariable Long id) {
         return ResponseEntity.ok(userService.updateContact(contact, id));
     }
 
     @DeleteMapping("/contact/delete/{id}")
-    public void remove(@PathVariable Long id) {
+    void remove(@PathVariable Long id) {
         userService.deleteContact(id);
     }
 
     @DeleteMapping("/contacts/delete")
-    public void remove(@RequestBody List<Long> ids) {
+    void remove(@RequestBody List<Long> ids) {
         userService.deleteContacts(ids);
     }
 
     @PostMapping(value = "/contacts/import", consumes = "multipart/form-data")
-    public void importContacts(@RequestParam("csvFile") MultipartFile file) {
+    void importContacts(@RequestParam("csvFile") MultipartFile file) {
         csvService.importCsv(file);
     }
 }

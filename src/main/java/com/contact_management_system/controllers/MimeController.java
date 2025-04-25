@@ -19,12 +19,12 @@ public class MimeController {
     }
 
     @PostMapping("/password/reset/{recipientEmail}")
-    public void resetPasswordMail(@PathVariable String recipientEmail) throws MessagingException, IOException {
+    void resetPasswordMail(@PathVariable String recipientEmail) throws MessagingException, IOException {
         mimeService.sendEmail(recipientEmail);
     }
 
     @PostMapping("/password/reset")
-    public void resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
+    void resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
         mimeService.resetPassword(resetPasswordDto);
     }
 }
