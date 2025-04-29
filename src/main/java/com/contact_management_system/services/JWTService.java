@@ -7,6 +7,7 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -15,6 +16,7 @@ import static java.time.Instant.now;
 import static java.util.Date.from;
 
 @Service
+@Slf4j
 public class JWTService {
 
     private final JWTPropertiesConfig jwtProperties;
@@ -23,8 +25,9 @@ public class JWTService {
         this.jwtProperties = jwtProperties;
     }
 
-    public String serializedJwt(User user) throws JOSEException {
-        var jwt = new SignedJWT(header(), claimSet(Map.of("id", user.getId(), "name", user.getUsername(), "email", user.getEmail())));
+    public String signJWT(User user) throws JOSEException {
+        log.info("Signing JWT for userId: {}", user.getId());
+        var jwt = new SignedJWT(header(), payload(user));
         jwt.sign(new MACSigner(jwtProperties.getKey()));
         return jwt.serialize();
     }
@@ -33,7 +36,8 @@ public class JWTService {
         return new JWSHeader.Builder(jwtProperties.getAlgorithm()).build();
     }
 
-    private JWTClaimsSet claimSet(Map<String, Object> claims) {
+    private JWTClaimsSet payload(User user) {
+        Map<String, Object> claims = Map.of("id", user.getId(), "name", user.getUsername(), "email", user.getEmail());
         var claimSetBuilder = new JWTClaimsSet.Builder()
                 .issuer(jwtProperties.getIssuer())
                 .issueTime(from(now()))

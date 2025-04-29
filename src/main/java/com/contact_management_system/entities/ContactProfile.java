@@ -40,4 +40,13 @@ public class ContactProfile {
     @OneToMany(cascade = {PERSIST, MERGE}, orphanRemoval = true, fetch = EAGER, mappedBy = "contactProfile")
     @JsonManagedReference
     private List<PhoneNumber> phoneNumbers;
+
+    @Override
+    public String toString() {
+        return "ContactProfile{" +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }

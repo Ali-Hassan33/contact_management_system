@@ -52,8 +52,8 @@ class JWTServiceTests {
 
     @Test
     @DisplayName("Should create a valid JWT token for a user")
-    void testSerializedJwt() throws JOSEException, ParseException {
-        String jwtString = jwtService.serializedJwt(testUser);
+    void testSignJWT() throws JOSEException, ParseException {
+        String jwtString = jwtService.signJWT(testUser);
 
         assertNotNull(jwtString);
 
@@ -73,9 +73,9 @@ class JWTServiceTests {
 
     @Test
     @DisplayName("Should throw NullPointerException when signing with null key")
-    void testSerializedJwtWithInvalidKey() {
+    void testSignJWTWithInvalidKey() {
         when(jwtProperties.getKey()).thenReturn(null);
 
-        assertThrows(NullPointerException.class, () -> jwtService.serializedJwt(testUser));
+        assertThrows(NullPointerException.class, () -> jwtService.signJWT(testUser));
     }
 }

@@ -9,6 +9,7 @@ import com.contact_management_system.enums.Label;
 import com.contact_management_system.exceptions.EmailNotFoundException;
 import com.contact_management_system.repositories.ContactProfileRepository;
 import com.contact_management_system.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import static com.contact_management_system.enums.Label.PERSONAL;
 import static com.contact_management_system.enums.Label.WORK;
 
 @Service
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -41,11 +43,13 @@ public class UserService {
 
     public Page<ContactProfile> getContacts(Authentication authentication) {
         syncAuthenticatedUserId(authentication);
+        log.info("Fetching all contacts for userId: {}", authenticatedUserId);
         return contactProfileRepository.findAllByUserId(authenticatedUserId, Pageable.unpaged());
     }
 
     public Page<ContactProfile> getContactsPaginated(Authentication authentication, Integer pageNo, Integer pageSize) {
         syncAuthenticatedUserId(authentication);
+        log.info("Fetching paginated contacts for userId: {}, page: {}, pageSize: {}", authenticatedUserId, pageNo, pageSize);
         return contactProfileRepository.findAllByUserId(authenticatedUserId, PageRequest.of(pageNo, pageSize));
     }
 
@@ -61,6 +65,7 @@ public class UserService {
 
     @Transactional
     public ContactProfile saveContact(ContactProfile contactProfile) {
+        log.info("Saving contact: {}", contactProfile);
         contactProfile.setUser(userRepository.findById(authenticatedUserId).orElseThrow());
 
         contactProfile.getPhoneNumbers()
@@ -78,6 +83,7 @@ public class UserService {
 
     @Transactional
     public ContactProfile updateContact(ContactProfile transientContact, Long id) {
+        log.info("Updating contact with ID: {}", id);
         ContactProfile contact = contactProfileRepository.getContactProfileById(id);
 
         contact.setFirstName(transientContact.getFirstName());
@@ -90,15 +96,17 @@ public class UserService {
     }
 
     public void deleteContact(Long id) {
+        log.info("Deleting contact with id {}", id);
         contactProfileRepository.deleteById(id);
     }
 
     public void deleteContacts(List<Long> ids) {
+        log.info("Deleting contacts with IDs: {}", ids);
         contactProfileRepository.deleteAllById(ids);
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(EmailNotFoundException::new);
+        return userRepository.findByEmail(email).orElseThrow(() -> new EmailNotFoundException(email));
     }
 
     public boolean isUserExist(String email) {

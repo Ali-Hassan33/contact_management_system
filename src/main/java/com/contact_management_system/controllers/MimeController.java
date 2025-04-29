@@ -3,10 +3,7 @@ package com.contact_management_system.controllers;
 
 import com.contact_management_system.dtos.ResetPasswordDto;
 import com.contact_management_system.services.MimeService;
-import jakarta.mail.MessagingException;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/mime")
@@ -19,7 +16,7 @@ public class MimeController {
     }
 
     @PostMapping("/password/reset/{recipientEmail}")
-    void resetPasswordMail(@PathVariable String recipientEmail) throws MessagingException, IOException {
+    void resetPasswordMail(@PathVariable String recipientEmail) {
         mimeService.sendEmail(recipientEmail);
     }
 

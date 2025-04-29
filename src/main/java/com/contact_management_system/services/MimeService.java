@@ -2,10 +2,13 @@ package com.contact_management_system.services;
 
 import com.contact_management_system.dtos.ResetPasswordDto;
 import com.contact_management_system.entities.Mime;
+import com.contact_management_system.exceptions.TokenExpiredException;
 import com.contact_management_system.repositories.MimeRepository;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -13,13 +16,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
+@Slf4j
 public class MimeService {
 
     private final JavaMailSender mailSender;
@@ -43,7 +47,9 @@ public class MimeService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void sendEmail(String recipientEmail) throws MessagingException, IOException {
+    @SneakyThrows
+    public void sendEmail(String recipientEmail)  {
+        log.info("Initiating password reset email for recipient: {}", recipientEmail);
         MimeMessage mimeMessage = mailSender.createMimeMessage();
 
         MimeMessageHelper mimeHelper = new MimeMessageHelper(mimeMessage, true);
@@ -66,8 +72,13 @@ public class MimeService {
 
     @Transactional
     public void resetPassword(ResetPasswordDto resetPasswordDto) {
-        mimeRepository.getReferenceById(UUID.fromString(resetPasswordDto.getToken()))
-                .getUser()
-                .setPassword(passwordEncoder.encode(resetPasswordDto.getNewPassword()));
+        String token = resetPasswordDto.getToken();
+        log.info("Initiating password reset for user with token: {}", token);
+        try {
+            Mime mime = mimeRepository.getReferenceById(UUID.fromString(token));
+            mime.getUser().setPassword(passwordEncoder.encode(resetPasswordDto.getNewPassword()));
+        } catch(EntityNotFoundException ex) {
+            throw new TokenExpiredException(format("The token %s is invalid or has expired", token));
+        }
     }
 }

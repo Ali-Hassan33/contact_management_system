@@ -73,7 +73,7 @@ class AuthServiceTests {
         
         when(authentication.getPrincipal()).thenReturn(email);
         when(userService.getUserByEmail(email)).thenReturn(user);
-        when(jwtService.serializedJwt(user)).thenReturn(expectedToken);
+        when(jwtService.signJWT(user)).thenReturn(expectedToken);
         
         // Act
         String result = authService.login(authentication);
@@ -81,7 +81,7 @@ class AuthServiceTests {
         // Assert
         assertEquals(expectedToken, result);
         verify(userService).getUserByEmail(email);
-        verify(jwtService).serializedJwt(user);
+        verify(jwtService).signJWT(user);
     }
 
     @Test
@@ -102,7 +102,7 @@ class AuthServiceTests {
         when(oAuth2AuthenticationToken.getPrincipal()).thenReturn(oAuth2User);
         when(userService.isUserExist(email)).thenReturn(true);
         when(userService.getUserByEmail(email)).thenReturn(user);
-        when(jwtService.serializedJwt(user)).thenReturn(expectedToken);
+        when(jwtService.signJWT(user)).thenReturn(expectedToken);
         
         // Act
         String result = authService.login(oAuth2AuthenticationToken);
@@ -112,7 +112,7 @@ class AuthServiceTests {
         verify(userService).isUserExist(email);
         verify(userService).getUserByEmail(email);
         verify(userService, never()).saveOAuth2User(any());
-        verify(jwtService).serializedJwt(user);
+        verify(jwtService).signJWT(user);
     }
 
     @Test
@@ -134,7 +134,7 @@ class AuthServiceTests {
         when(oAuth2AuthenticationToken.getPrincipal()).thenReturn(oAuth2User);
         when(userService.isUserExist(email)).thenReturn(false);
         when(userService.saveOAuth2User(any(UserDto.class))).thenReturn(newUser);
-        when(jwtService.serializedJwt(newUser)).thenReturn(expectedToken);
+        when(jwtService.signJWT(newUser)).thenReturn(expectedToken);
         
         // Act
         String result = authService.login(oAuth2AuthenticationToken);
@@ -144,6 +144,6 @@ class AuthServiceTests {
         verify(userService).isUserExist(email);
         verify(userService, never()).getUserByEmail(anyString());
         verify(userService).saveOAuth2User(any(UserDto.class));
-        verify(jwtService).serializedJwt(newUser);
+        verify(jwtService).signJWT(newUser);
     }
 }

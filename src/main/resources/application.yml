@@ -6,7 +6,7 @@ spring:
     init:
       mode: never
   jpa:
-    show-sql: true
+    show-sql: off
   mail:
     host: smtp.gmail.com
     port: 587

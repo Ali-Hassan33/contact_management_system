@@ -4,9 +4,10 @@ import com.contact_management_system.entities.Mime;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public interface MimeRepository extends JpaRepository<Mime, UUID> {
 
-    void deleteByCreatedAtBefore(Date createdAtBefore);
+    List<Mime> deleteByCreatedAtBefore(Date createdAtBefore);
 }

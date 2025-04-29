@@ -3,6 +3,7 @@ package com.contact_management_system.services;
 import com.contact_management_system.dtos.UserDto;
 import com.contact_management_system.entities.User;
 import com.nimbusds.jose.JOSEException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import static java.lang.String.valueOf;
 
 @Service
+@Slf4j
 public class AuthService {
 
     private final UserService userService;
@@ -24,6 +26,7 @@ public class AuthService {
     }
 
     public User signUp(UserDto user) {
+        log.info("Attempting to sign up user with email: {}", user.getEmail());
         return userService.saveBasicAuthUser(user);
     }
 
@@ -37,8 +40,8 @@ public class AuthService {
         if (oAuth2Token.isPresent())
             user = getOAuth2User(oAuth2Token.get().getPrincipal());
         else user = getBasicAuthUser(authentication);
-
-        return jwtService.serializedJwt(user);
+        log.info("Log in attempt with email: {}", user.getEmail());
+        return jwtService.signJWT(user);
     }
 
     private User getBasicAuthUser(Authentication authentication) {
