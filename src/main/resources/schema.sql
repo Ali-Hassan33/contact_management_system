@@ -5,7 +5,9 @@ create table users (
     username     varchar(255),
     password     varchar(255),
     phone_number varchar(255),
-    email        varchar(255),
+    email        varchar(255)
+        constraint unique_email
+            unique,
     created_at   timestamp,
     updated_at   timestamp
 );

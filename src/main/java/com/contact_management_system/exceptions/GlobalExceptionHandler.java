@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
@@ -19,8 +20,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    public ResponseEntity<String> handleTokenExpiredException(TokenExpiredException ex) {
+    ResponseEntity<String> handleTokenExpiredException(TokenExpiredException ex) {
         log.error("TokenExpiredException: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleAllExceptions(Exception ex) {
+        return new ResponseEntity<>("An error occurred: " + ex.getMessage(), INTERNAL_SERVER_ERROR);
     }
 }
