@@ -34,6 +34,17 @@ It provides an intuitive interface for managing your contacts with features for 
    ```
    
 ---
+### Database Initialization Mode
+To ensure that SQL scripts are executed when the application starts. Modify the value of the following property to `always` in `application.yml` file:
+
+```yaml
+spring:
+  sql:
+    init:
+      mode: always
+```
+
+Use the mode `always` only during the initial startup.
 
 ## Contribution
 
