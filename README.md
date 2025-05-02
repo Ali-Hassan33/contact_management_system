@@ -2,6 +2,8 @@
 
 Contactly is a responsive contact management application built with React & Spring Boot.
 It provides an intuitive interface for managing your contacts with features for adding, editing, deleting, and importing/exporting contacts.
+![Image](https://github.com/user-attachments/assets/294b8904-8056-44da-bd2d-bb2fc7d0ac1a)
+![Image](https://github.com/user-attachments/assets/214f1ca8-1e4f-4615-a87f-3489e2c77c05)
 
 ---
 
