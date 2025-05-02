@@ -58,7 +58,6 @@ public class WebSecurityConfig {
     @Order(3)
     SecurityFilterChain githubSecurityFilterChain(HttpSecurity http, final CorsConfigurationSource corsConfigurationSource) throws Exception {
         return http
-//                .securityMatcher("/github/oauth/**", "/login/oauth2/code/**", "/oauth2/authorization/**")
                 .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/github", true))
                 .authorizeHttpRequests(request -> request.requestMatchers("/github/oauth/login")
                         .authenticated()
