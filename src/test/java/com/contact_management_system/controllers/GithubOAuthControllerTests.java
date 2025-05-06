@@ -1,6 +1,7 @@
 package com.contact_management_system.controllers;
 
 import com.contact_management_system.services.AuthService;
+import com.nimbusds.jose.JOSEException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,6 +54,23 @@ class GithubOAuthControllerTests {
         mockMvc.perform(post("/github/oauth/login"))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @DisplayName("Should handle JWT creation errors during login")
+    @WithMockUser(username = "github_user@example.com")
+    void testLoginWithJoseException() throws Exception {
+        when(authService.login(any(Authentication.class))).thenThrow(new JOSEException("Error creating JWT"));
+
+        boolean exceptionThrown = false;
+        try {
+            mockMvc.perform(post("/github/oauth/login"));
+        } catch (Exception e) {
+            exceptionThrown = true;
+        }
+
+        assertTrue(exceptionThrown, "Expected exception was not thrown");
+    }
+
 
     static class TestSecurityConfig {
 
