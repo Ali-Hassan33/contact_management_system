@@ -3,7 +3,6 @@ package com.contact_management_system.controllers;
 import com.contact_management_system.dtos.UserDto;
 import com.contact_management_system.entities.User;
 import com.contact_management_system.services.AuthService;
-import com.nimbusds.jose.JOSEException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
