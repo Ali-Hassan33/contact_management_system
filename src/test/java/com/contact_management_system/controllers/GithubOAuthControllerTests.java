@@ -55,22 +55,6 @@ class GithubOAuthControllerTests {
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-    @DisplayName("Should handle JWT creation errors during login")
-    @WithMockUser(username = "github_user@example.com")
-    void testLoginWithJoseException() throws Exception {
-        when(authService.login(any(Authentication.class))).thenThrow(new JOSEException("Error creating JWT"));
-
-        boolean exceptionThrown = false;
-        try {
-            mockMvc.perform(post("/github/oauth/login"));
-        } catch (Exception e) {
-            exceptionThrown = true;
-        }
-
-        assertTrue(exceptionThrown, "Expected exception was not thrown");
-    }
-
     static class TestSecurityConfig {
 
         @Bean

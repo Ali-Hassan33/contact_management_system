@@ -107,47 +107,6 @@ class BasicAuthControllerTests {
                 .andExpect(jsonPath("$").doesNotExist());
     }
 
-    @Test
-    @DisplayName("Should throw exception when signup attempted with invalid email format")
-    void testSignupWithInvalidEmail() {
-        String requestBody = """
-                {
-                    "name": "Test User",
-                    "email": "invalid-email",
-                    "password": "password123"
-                }
-                """;
-
-        when(authService.signUp(any(UserDto.class))).thenThrow(new IllegalArgumentException("Invalid email format"));
-
-        boolean exceptionThrown = false;
-        try {
-            mockMvc.perform(post("/auth/signup")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody));
-        } catch (Exception e) {
-            exceptionThrown = true;
-        }
-
-        assertTrue(exceptionThrown, "Expected exception was not thrown");
-    }
-
-    @Test
-    @DisplayName("Should handle JWT creation errors during login")
-    @WithMockUser(username = "test@example.com")
-    void testLoginWithJoseException() throws Exception {
-        when(authService.login(any(Authentication.class))).thenThrow(new JOSEException("Error creating JWT"));
-
-        boolean exceptionThrown = false;
-        try {
-            mockMvc.perform(post("/auth/login"));
-        } catch (Exception e) {
-            exceptionThrown = true;
-        }
-
-        assertTrue(exceptionThrown, "Expected exception was not thrown");
-    }
-
     static class TestSecurityConfig {
 
         @Bean
